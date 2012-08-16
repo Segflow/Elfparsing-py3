@@ -1,3 +1,21 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+#
+#    Copyright (C) 2012-08 Assel Meher - http://www.twitter.com/asselmeher
+#
+#    This program is free software: you can redistribute it and/or modify
+#    it under the terms of the GNU General Public License as published by
+#    the Free Software Foundation, either version 3 of the License, or
+#    (at your option) any later version.
+#
+#    This program is distributed in the hope that it will be useful,
+#    but WITHOUT ANY WARRANTY; without even the implied warranty of
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#    GNU General Public License for more details.
+#
+#    You should have received a copy of the GNU General Public License
+#    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+#
 
 from elfparser.flags import *
 from struct import pack,unpack
@@ -5,8 +23,9 @@ from struct import pack,unpack
 class Section(object):
 	"""Class representing a Section"""
 	def __init__(self, data,arch = ELFCLASS32):
-		self.data      = data
-		self.str_name     = None
+		self.data         = data
+		self._arch        = arch
+		self.name         = None
 		self.sh_name      = None
 		self.sh_type      = None
 		self.sh_flags     = None
@@ -18,13 +37,13 @@ class Section(object):
 		self.sh_addralign = None
 		self.sh_entsize   = None
 
-		self._parseRawData(arch)
+		self._parseRawData()
 
 
-	def _parseRawData(self,arch):
+	def _parseRawData(self):
 		try:
-			if arch == ELFCLASS32:
-				self.str_name     = None
+			if self._arch == ELFCLASS32:
+				self.name         = None
 				self.sh_name      = unpack("<I", self.data[0:4])[0]
 				self.sh_type      = unpack("<I", self.data[4:8])[0]
 				self.sh_flags     = unpack("<I", self.data[8:12])[0]
@@ -36,8 +55,8 @@ class Section(object):
 				self.sh_addralign = unpack("<I", self.data[32:36])[0]
 				self.sh_entsize   = unpack("<I", self.data[36:40])[0]
 			
-			elif arch == ELFCLASS64:
-				self.str_name     = None
+			elif self._arch == ELFCLASS64:
+				self.name     = None
 				self.sh_name      = unpack("<I", self.data[0:4])[0]
 				self.sh_type      = unpack("<I", self.data[4:8])[0]
 				self.sh_flags     = unpack("<Q", self.data[8:16])[0]
@@ -51,3 +70,15 @@ class Section(object):
 				
 		except Exception as err:
 			print(err)
+
+	def isExecutable(self):
+		"""
+		Return True if the section is executable, False esle
+		"""
+		return self.sh_flags & (1 << 2) == SHF_EXECINSTR
+
+	def isWritable(self):
+		"""
+		Return True if the section is writable, False esle
+		"""
+		return self.sh_flags & (1 << 0) == SHF_WRITE

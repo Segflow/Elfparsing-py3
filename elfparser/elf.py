@@ -1,3 +1,21 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+#
+#    Copyright (C) 2012-08 Assel Meher - http://www.twitter.com/asselmeher
+#
+#    This program is free software: you can redistribute it and/or modify
+#    it under the terms of the GNU General Public License as published by
+#    the Free Software Foundation, either version 3 of the License, or
+#    (at your option) any later version.
+#
+#    This program is distributed in the hope that it will be useful,
+#    but WITHOUT ANY WARRANTY; without even the implied warranty of
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#    GNU General Public License for more details.
+#
+#    You should have received a copy of the GNU General Public License
+#    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+#
 
 from elfparser.flags import *
 from elfparser.section import Section
@@ -128,17 +146,17 @@ class Elf():
 		stroff = self.shdr_l[self.e_shstrndx].sh_offset
 		string_table = self._mmapBinary[stroff:]
 		for i in range(shdr_num):
-			self.shdr_l[i].str_name = string_table[self.shdr_l[i].sh_name:].decode('utf8',errors='ignore').split('\0')[0]
+			self.shdr_l[i].name = string_table[self.shdr_l[i].sh_name:].decode('utf8',errors='ignore').split('\0')[0]
 
 	def loadCode(self, code):
 		""" Load Binary code """
 		self._mmapBinary = code
 
 		if self.isElf():
-			self.__setHeaderElf()
-			self.__setShdr()
-			#self.__setPhdr()
-			#self.__setSym()
+			self._setHeaderElf()
+			self._setShdr()
+			#self._setPhdr()
+			#self._setSym()
 
 	def saveBinary(self, filename):
 		"""
@@ -168,6 +186,17 @@ class Elf():
 		else:
 			raise TypeError('Only bytes objects or Elf objects can be compared')
 
+	def getEntryPoint(self):
+		"""
+		Return entry Point address
+		"""
+		return self.e_entry
+
+	def getFileSize(self):
+		"""
+		Return the file size
+		"""
+		return (len(self._mmapBinary))
 
 	def getSectionByName(self, section_name):
 		"""
@@ -177,3 +206,16 @@ class Elf():
 		for shdr in self.shdr_l:
 			if shdr.str_name == section_name:
 				return shdr
+
+	def getSections(self, filter_fn = None):
+		"""
+		Return the Sections list
+		if the 'filter_fn'parametre is provided, it will be used as a filter
+		Exemple : 
+			getSections(lambda sect: sect.isExecutable()) # return only executable Sections
+		"""
+		if filter_fn is None:
+			return self.shdr_l
+		else:
+			filtred = [shdr for shdr in self.shdr_l if filter_fn(shdr)]
+			return filtred
