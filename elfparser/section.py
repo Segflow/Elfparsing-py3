@@ -39,13 +39,12 @@ class Section(object):
 
 		self._parseRawData()
 
-
 	def _parseRawData(self):
 		try:
+			self.sh_name      = unpack("<I", self.data[0:4])[0]
+			self.sh_type      = unpack("<I", self.data[4:8])[0]
 			if self._arch == ELFCLASS32:
 				self.name         = None
-				self.sh_name      = unpack("<I", self.data[0:4])[0]
-				self.sh_type      = unpack("<I", self.data[4:8])[0]
 				self.sh_flags     = unpack("<I", self.data[8:12])[0]
 				self.sh_addr      = unpack("<I", self.data[12:16])[0]
 				self.sh_offset    = unpack("<I", self.data[16:20])[0]
@@ -56,9 +55,7 @@ class Section(object):
 				self.sh_entsize   = unpack("<I", self.data[36:40])[0]
 			
 			elif self._arch == ELFCLASS64:
-				self.name     = None
-				self.sh_name      = unpack("<I", self.data[0:4])[0]
-				self.sh_type      = unpack("<I", self.data[4:8])[0]
+				self.name         = None
 				self.sh_flags     = unpack("<Q", self.data[8:16])[0]
 				self.sh_addr      = unpack("<Q", self.data[16:24])[0]
 				self.sh_offset    = unpack("<Q", self.data[24:32])[0]
@@ -70,6 +67,13 @@ class Section(object):
 				
 		except Exception as err:
 			print(err)
+
+	def __contains__(self,addr):
+		end = self.sh_addr + self.sh_size
+		return (self.sh_addr != 0 and addr >= self.sh_addr and addr < end)
+
+	def __repr__(self):
+		return "Section: '{}'".format(self.name)
 
 	def isExecutable(self):
 		"""

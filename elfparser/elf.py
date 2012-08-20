@@ -94,6 +94,14 @@ class Elf():
 		else:
 			return self._mmapBinary
 
+	def whereIs(self,addr):
+		"""
+		Look out in which section the address 'addr' exist
+		"""
+		for sect in self.shdr_l:
+			if addr in sect:
+				return sect
+
 	def _setHeaderElf(self):
 		""" Parse ELF header """
 		try:
@@ -204,7 +212,7 @@ class Elf():
 		Exemple - getSectionByName(".text")
 		"""
 		for shdr in self.shdr_l:
-			if shdr.str_name == section_name:
+			if shdr.name == section_name:
 				return shdr
 
 	def getSections(self, filter_fn = None):

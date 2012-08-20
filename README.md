@@ -1,13 +1,23 @@
 Elfparsing-py3
 ==============
 
-Parsing ELF file
+Python3 package for Parsing ELF file
 
+Installation
+------------
+
+    git clone https://github.com/xGeek/Elfparsing-py3
+    cd ./Elfparsing-py3
+    python3 setup.py install  [as root]
+
+
+Exemple
+-------
 
 ```python
 from elfparser.elf import Elf
 
-binary = Elf('Binfile')
+binary = Elf('Binfile') # Elf is the main class
 
 if not binary.isElf():
 	print("Not an ELF file")
