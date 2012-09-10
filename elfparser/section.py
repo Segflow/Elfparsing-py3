@@ -73,7 +73,7 @@ class Section(object):
 		return (self.sh_addr != 0 and addr >= self.sh_addr and addr < end)
 
 	def __repr__(self):
-		return "Section: '{}'".format(self.name)
+		return str("Section: '{}'".format(self.name))
 
 	def isExecutable(self):
 		"""
