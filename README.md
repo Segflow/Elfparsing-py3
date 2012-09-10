@@ -1,17 +1,16 @@
-Elfparsing-py3
-==============
+#Elfparsing-py3
 
 Python3 package for Parsing ELF file
 
-Installation
-------------
+##Installation
+
 
     git clone https://github.com/xGeek/Elfparsing-py3
     cd ./Elfparsing-py3
     python3 setup.py install  [as root]
 
 
-Exemple
+##Exemple
 -------
 
 ```python
@@ -24,7 +23,7 @@ if not binary.isElf():
 	exit(1)
 
 # Showing all executables sections
-executables = binary.getSections(lambda x:x.isExecutable())
+executables = binary.getSections(lambda x:x.isExecutable()) # we can use 'isWritable()' to select only writable sections ;)
 for s in executables:
 	print(s.name)
 ```
